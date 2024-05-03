@@ -8,15 +8,31 @@ URL="$1"              # 移植包下载地址
 GITHUB_ENV="$2"       # 输出环境变量
 GITHUB_WORKSPACE="$3" # 工作目录
 
+device=houji # 设备代号
+
 Red='\033[1;31m'    # 粗体红色
 Yellow='\033[1;33m' # 粗体黄色
 Blue='\033[1;34m'   # 粗体蓝色
-Green='\033[1;32m'  # 粗体绿色                                    
+Green='\033[1;32m'  # 粗体绿色
+
+port_os_version=$(echo ${URL} | cut -d"/" -f4)                   
+port_version=$(echo ${port_os_version} | sed 's/OS1/V816/g')     
+port_zip_name=$(echo ${URL} | cut -d"/" -f5)                   
+vendor_os_version=$(echo ${URL} | cut -d"/" -f4)          
+vendor_version=$(echo ${vendor_os_version} | sed 's/OS1/V816/g')
+vendor_zip_name=$(echo ${URL} | cut -d"/" -f5)     
+
+android_version=$(echo ${URL} | cut -d"_" -f5 | cut -d"." -f1) 
+build_time=$(date) && build_utc=$(date -d "$build_time" +%s)   
 
 sudo chmod -R 777 "$GITHUB_WORKSPACE"/tools
+magiskboot="$GITHUB_WORKSPACE"/tools/magiskboot
+ksud="$GITHUB_WORKSPACE"/tools/ksud
+a7z="$GITHUB_WORKSPACE"/tools/7zzs
 zstd="$GITHUB_WORKSPACE"/tools/zstd
 payload_extract="$GITHUB_WORKSPACE"/tools/payload_extract
 erofs_extract="$GITHUB_WORKSPACE"/tools/extract.erofs
+erofs_mkfs="$GITHUB_WORKSPACE"/tools/mkfs.erofs
 lpmake="$GITHUB_WORKSPACE"/tools/lpmake
 apktool_jar="java -jar "$GITHUB_WORKSPACE"/tools/apktool.jar"
 
@@ -58,6 +74,7 @@ End_Time() {
 
 ### 系统包下载
 echo -e "${Red}- 开始下载系统包"
+echo -e "${Yellow}- 开始下载移植包"
 Start_Time
 aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" "$URL"
 ### 系统包下载结束
@@ -69,15 +86,18 @@ mkdir -p "$GITHUB_WORKSPACE"/"${device}"
 mkdir -p "$GITHUB_WORKSPACE"/images/config
 mkdir -p "$GITHUB_WORKSPACE"/zip
 
-echo -e "${Yellow}- 开始解压包"
+echo -e "${Yellow}- 开始解压移植包"
+Start_Time
+$a7z x "$GITHUB_WORKSPACE"/$port_zip_name -r -o"$GITHUB_WORKSPACE"/Third_Party >/dev/null
+End_Time 解压移植包
 sudo mkdir -p "$GITHUB_WORKSPACE"/"${device}"/firmware-update/
 sudo cp -rf "$GITHUB_WORKSPACE"/Extra_dir/* "$GITHUB_WORKSPACE"/"${device}"/firmware-update/
 cd "$GITHUB_WORKSPACE"/images
-echo -e "${Red}- 开始解包payload"
+echo -e "${Red}- 开始解移植包payload"
 $payload_extract -s -o "$GITHUB_WORKSPACE"/images/ -i "$GITHUB_WORKSPACE"/Third_Party/payload.bin -X system -T0
-echo -e "${Red}- 开始分解包image"
+echo -e "${Red}- 开始分解移植包image"
 for i in system; do
-  echo -e "${Yellow}- 正在分解包: $i"
+  echo -e "${Yellow}- 正在分解移植包: $i"
   sudo $erofs_extract -s -i "$GITHUB_WORKSPACE"/images/$i.img -x
   rm -rf "$GITHUB_WORKSPACE"/images/$i.img
 done
