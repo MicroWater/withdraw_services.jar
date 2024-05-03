@@ -125,4 +125,7 @@ sudo find "$GITHUB_WORKSPACE"/apk/services/smali_classes2/com/android/server/pm/
 done
 cd "$GITHUB_WORKSPACE"/apk/services/
 sudo $apktool_jar b -q -f -c "$GITHUB_WORKSPACE"/apk/services/ -o services.jar
+mkdir -p "$GITHUB_WORKSPACE"/GithubRelease
+sudo cp -rf "$GITHUB_WORKSPACE"/apk/services/services.jar "$GITHUB_WORKSPACE"/GithubRelease/services.jar
+sudo cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/services.jar.prof "$GITHUB_WORKSPACE"/GithubRelease/services.jar.prof
 
