@@ -29,6 +29,8 @@ jobs:
         run: |
           mkdir -p "$GITHUB_WORKSPACE"/GithubRelease
           cd "$GITHUB_WORKSPACE"/GithubRelease
+          cp -rf "$GITHUB_WORKSPACE"/apk/services/services.jar "$GITHUB_WORKSPACE"/GithubRelease/services.jar
+          cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/services.jar.prof "$GITHUB_WORKSPACE"/GithubRelease/services.jar.prof
           cd "$GITHUB_WORKSPACE"
       - name: 上传到 Github Release
         uses: ncipollo/release-action@main

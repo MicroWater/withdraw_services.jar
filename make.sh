@@ -90,29 +90,13 @@ echo -e "${Yellow}- 开始解压移植包"
 Start_Time
 $a7z x "$GITHUB_WORKSPACE"/$port_zip_name -r -o"$GITHUB_WORKSPACE"/Third_Party >/dev/null
 End_Time 解压移植包
-echo -e "${Yellow}- 开始解压底包"
-Start_Time
-$a7z x "$GITHUB_WORKSPACE"/${vendor_zip_name} -o"$GITHUB_WORKSPACE"/"${device}" payload.bin >/dev/null
-rm -rf "$GITHUB_WORKSPACE"/${vendor_zip_name}
-End_Time 解压底包
-mkdir -p "$GITHUB_WORKSPACE"/Extra_dir
-echo -e "${Red}- 开始解底包payload"
-$payload_extract -s -o "$GITHUB_WORKSPACE"/Extra_dir/ -i "$GITHUB_WORKSPACE"/"${device}"/payload.bin -X system,system_ext,product -e -T0
-sudo rm -rf "$GITHUB_WORKSPACE"/"${device}"/payload.bin
-echo -e "${Red}- 开始分解底包image"
-for i in mi_ext odm system_dlkm vendor vendor_dlkm; do
-  echo -e "${Yellow}- 正在分解底包: $i.img"
-  cd "$GITHUB_WORKSPACE"/"${device}"
-  sudo $erofs_extract -s -i "$GITHUB_WORKSPACE"/Extra_dir/$i.img -x
-  rm -rf "$GITHUB_WORKSPACE"/Extra_dir/$i.img
-done
 sudo mkdir -p "$GITHUB_WORKSPACE"/"${device}"/firmware-update/
 sudo cp -rf "$GITHUB_WORKSPACE"/Extra_dir/* "$GITHUB_WORKSPACE"/"${device}"/firmware-update/
 cd "$GITHUB_WORKSPACE"/images
 echo -e "${Red}- 开始解移植包payload"
-$payload_extract -s -o "$GITHUB_WORKSPACE"/images/ -i "$GITHUB_WORKSPACE"/Third_Party/payload.bin -X product,system,system_ext -T0
+$payload_extract -s -o "$GITHUB_WORKSPACE"/images/ -i "$GITHUB_WORKSPACE"/Third_Party/payload.bin -X system -T0
 echo -e "${Red}- 开始分解移植包image"
-for i in product system system_ext; do
+for i in system; do
   echo -e "${Yellow}- 正在分解移植包: $i"
   sudo $erofs_extract -s -i "$GITHUB_WORKSPACE"/images/$i.img -x
   rm -rf "$GITHUB_WORKSPACE"/images/$i.img
@@ -141,5 +125,4 @@ sudo find "$GITHUB_WORKSPACE"/apk/services/smali_classes2/com/android/server/pm/
 done
 cd "$GITHUB_WORKSPACE"/apk/services/
 sudo $apktool_jar b -q -f -c "$GITHUB_WORKSPACE"/apk/services/ -o services.jar
-sudo cp -rf "$GITHUB_WORKSPACE"/apk/services/services.jar "$GITHUB_WORKSPACE"/GithubRelease/services.jar
-sudo cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/services.jar.prof "$GITHUB_WORKSPACE"/GithubRelease/services.jar.prof
+
