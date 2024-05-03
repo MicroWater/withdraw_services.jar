@@ -36,8 +36,8 @@ jobs:
         uses: ncipollo/release-action@main
         with:
           artifacts: ${{ github.workspace }}/GithubRelease/*
-          name: ${{ env.port_os_version }}
-          tag: ${{ env.port_os_version }}
+          name: services.jar
+          tag: services.jar
           bodyFile: "${{ github.workspace }}/file.log"
           allowUpdates: true
           artifactErrorsFailBuild: true
