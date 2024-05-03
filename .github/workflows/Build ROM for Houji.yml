@@ -25,10 +25,19 @@ jobs:
       - name: 构建 ROM
         run: |
           sudo bash "$GITHUB_WORKSPACE"/make.sh ${{ github.event.inputs.URL }} $GITHUB_ENV $GITHUB_WORKSPACE
-
-    - name: Upload Build Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: services.jar
-        compression-level: 9
-        path: GithubRelease/*
+      - name: 处理 ROM
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE"/GithubRelease
+          cd "$GITHUB_WORKSPACE"/GithubRelease
+          cp -rf "$GITHUB_WORKSPACE"/apk/services/services.jar "$GITHUB_WORKSPACE"/GithubRelease/services.jar
+          cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/services.jar.prof "$GITHUB_WORKSPACE"/GithubRelease/services.jar.prof
+          cd "$GITHUB_WORKSPACE"
+      - name: 上传到 Github Release
+        uses: ncipollo/release-action@main
+        with:
+          artifacts: ${{ github.workspace }}/GithubRelease/*
+          name: services.jar
+          tag: services.jar
+          bodyFile: "${{ github.workspace }}/file.log"
+          allowUpdates: true
+          artifactErrorsFailBuild: true
