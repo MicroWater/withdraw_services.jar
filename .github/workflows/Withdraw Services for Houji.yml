@@ -22,17 +22,16 @@ jobs:
           remove-haskell: 'true'
       - name: 检出仓库文件
         uses: actions/checkout@main
-      - name: 构建 ROM
+      - name: 提取Services.jar
         run: |
           sudo bash "$GITHUB_WORKSPACE"/make.sh ${{ github.event.inputs.URL }} $GITHUB_ENV $GITHUB_WORKSPACE
-      - name: 处理 ROM
+      - name: 处理Services.jar
         run: |
           mkdir -p "$GITHUB_WORKSPACE"/GithubRelease
           cd "$GITHUB_WORKSPACE"/GithubRelease
           cp -rf "$GITHUB_WORKSPACE"/apk/services/services.jar "$GITHUB_WORKSPACE"/GithubRelease/services.jar
           cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/services.jar.prof "$GITHUB_WORKSPACE"/GithubRelease/services.jar.prof
           cd "$GITHUB_WORKSPACE"
-          
       - name: 上传
         uses: actions/upload-artifact@v4
         with:
