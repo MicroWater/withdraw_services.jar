@@ -32,12 +32,9 @@ jobs:
           cp -rf "$GITHUB_WORKSPACE"/apk/services/services.jar "$GITHUB_WORKSPACE"/GithubRelease/services.jar
           cp -rf "$GITHUB_WORKSPACE"/images/system/system/framework/services.jar.prof "$GITHUB_WORKSPACE"/GithubRelease/services.jar.prof
           cd "$GITHUB_WORKSPACE"
-      - name: 上传到 Github Release
-        uses: ncipollo/release-action@main
+      - name: Upload images artifact
+        uses: actions/upload-artifact@v4
         with:
-          artifacts: ${{ github.workspace }}/GithubRelease/*
           name: services.jar
-          tag: services.jar
-          bodyFile: "${{ github.workspace }}/file.log"
-          allowUpdates: true
-          artifactErrorsFailBuild: true
+          path: "$GITHUB_WORKSPACE"/GithubRelease/services.*
+
